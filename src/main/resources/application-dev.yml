@@ -1,0 +1,23 @@
+spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+  kafka:
+    bootstrap-servers: localhost:9093
+  application:
+    name: common-service
+
+logging:
+  file:
+    name: logs/application-%d{yyyy-MM-dd}.log
+  level:
+    '[com.ongraph.usermanagementapp]': info
+    '[org.springframework.web]': info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss}- %msg%n"
+        
+ongraph:
+  authentication:
+    secretKey: ongraphSecretKey
+    tokenExpTimeInMs: 86400000
