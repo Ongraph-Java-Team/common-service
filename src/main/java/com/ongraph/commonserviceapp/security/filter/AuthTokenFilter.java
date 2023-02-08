@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ongraph.commonserviceapp.cache.UserCacheRepository;
+import com.ongraph.commonserviceapp.context.UserDetailsContextHolder;
 import com.ongraph.commonserviceapp.model.UserDetailsImpl;
 import com.ongraph.commonserviceapp.util.JwtUtil;
 
@@ -35,14 +36,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 		var token = parseJwt(request);
 		if (token != null && jwtUtil.validateJwtToken(token)) {
 			var username = jwtUtil.getUserNameFromJwtToken(token);
+			var userDetails=userCacheRepository.findByUserName(username);
+			var userDetailsImpl =UserDetailsImpl.build(userDetails);
 
-			var userDetails =UserDetailsImpl.build(userCacheRepository.findByUserName(username));
-
-			var authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-					userDetails.getAuthorities());
+			var authentication = new UsernamePasswordAuthenticationToken(userDetailsImpl, null,
+					userDetailsImpl.getAuthorities());
 
 			authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+			UserDetailsContextHolder.set(userDetails);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		}
